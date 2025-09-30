@@ -26,11 +26,18 @@ interface MapViewProps {
   selectedStationId?: string;
 }
 
-function MapController({ center, zoom }: { center: [number, number]; zoom: number }) {
+interface MapControllerProps {
+  center: [number, number];
+  zoom: number;
+}
+
+function MapController({ center, zoom }: MapControllerProps) {
   const map = useMap();
+  
   useEffect(() => {
     map.setView(center, zoom, { animate: true });
   }, [center, zoom, map]);
+  
   return null;
 }
 
@@ -60,8 +67,6 @@ export function MapView({ stations, onStationSelect, selectedStationId }: MapVie
         className="h-full w-full"
         style={{ background: 'hsl(var(--card))' }}
       >
-        <MapController center={mapCenter} zoom={mapZoom} />
-        
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -136,6 +141,7 @@ export function MapView({ stations, onStationSelect, selectedStationId }: MapVie
             </Marker>
           );
         })}
+        <MapController center={mapCenter} zoom={mapZoom} />
       </MapContainer>
       
       {/* Legend */}
