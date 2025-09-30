@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { motion } from 'framer-motion';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { Station } from '@/lib/mockData';
 import { AQIBadge } from './AQIBadge';
@@ -26,33 +25,14 @@ interface MapViewProps {
   selectedStationId?: string;
 }
 
-interface MapControllerProps {
-  center: [number, number];
-  zoom: number;
-}
-
-function MapController({ center, zoom }: MapControllerProps) {
-  const map = useMap();
-  
-  useEffect(() => {
-    map.setView(center, zoom, { animate: true });
-  }, [center, zoom, map]);
-  
-  return null;
-}
-
 export function MapView({ stations, onStationSelect, selectedStationId }: MapViewProps) {
-  const [mapCenter, setMapCenter] = useState<[number, number]>([39.8283, -98.5795]); // US center
-  const [mapZoom, setMapZoom] = useState(4);
-  
   const selectedStation = stations.find(s => s.id === selectedStationId);
   
-  useEffect(() => {
-    if (selectedStation) {
-      setMapCenter([selectedStation.lat, selectedStation.lon]);
-      setMapZoom(12);
-    }
-  }, [selectedStation]);
+  // Set map center and zoom based on selection
+  const mapCenter: [number, number] = selectedStation 
+    ? [selectedStation.lat, selectedStation.lon] 
+    : [39.8283, -98.5795];
+  const mapZoom = selectedStation ? 12 : 4;
   
   return (
     <motion.div
@@ -62,6 +42,7 @@ export function MapView({ stations, onStationSelect, selectedStationId }: MapVie
       className="relative h-[500px] w-full rounded-xl overflow-hidden shadow-2xl border border-border"
     >
       <MapContainer
+        key={selectedStationId || 'default'}
         center={mapCenter}
         zoom={mapZoom}
         className="h-full w-full"
@@ -141,7 +122,6 @@ export function MapView({ stations, onStationSelect, selectedStationId }: MapVie
             </Marker>
           );
         })}
-        <MapController center={mapCenter} zoom={mapZoom} />
       </MapContainer>
       
       {/* Legend */}
